@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fusco2k/go-clinic-crud/model"
-	"strings"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 type PatientController struct {
@@ -22,6 +23,12 @@ func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
 		Id:    001,
 		FName: "James",
 		LName: "Bond",
+		Birth:21121992,
+		BloodType:"an",
+		Cpf:12312312312,
+		Email:"james@bond.com",
+		Mobile:12123451234,
+		Phone:1212341234,
 	}
 	//Parse the request to get data
 	err := r.ParseForm()
@@ -46,17 +53,25 @@ func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
 }
 
 func (pc PatientController) CreatePatient(w http.ResponseWriter, r *http.Request) {
-	err:=r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Print(r.Body)
+	u := model.Patient{}
+	err = json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Print(u)
 }
 
 func (pc PatientController) DeletePatient(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func (pc PatientController) ServeHttp(w http.ResponseWriter, r *http.Request) {
-
+	u:=model.Patient{}
+	err := json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(u.Id)
+	fmt.Println("patient: " + strconv.Itoa(u.Id) + " deleted")
 }
