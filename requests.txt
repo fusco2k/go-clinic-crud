@@ -1,0 +1,26 @@
+##FIND USER
+curl http://localhost:8080/user/1
+
+##CREATE USER
+curl -X POST -H "Content-Type: application/json" -d '{"fname":"James","lname":"Bond","email":"james@bond.com","blood":"an","id":1,"cf":12312312312,"birth":21121992,"phone":1212341234,"mobile":12123451234}' http://localhost:8080/user
+
+#DELETE USER
+curl -X DELETE -H "Content-Type: application/json" -d '{"id":1}' http://localhost:8080/user
+
+#GET USER
+curl -X GET -H "Content-Type: application/json" -d '{"id":1}' http://localhost:8080/user
+
+JSON Patient
+{"fname":"James","lname":"Bond","email":"james@bond.com","blood":"an","id":1,"cf":12312312312,"birth":21121992,"phone":1212341234,"mobile":12123451234}
+
+p := model.Patient{
+		Id:    1,
+		FName: "James",
+		LName: "Bond",
+		Birth:21121992,
+		BloodType:"an",
+		Cpf:12312312312,
+		Email:"james@bond.com",
+		Mobile:12123451234,
+		Phone:1212341234,
+	}
