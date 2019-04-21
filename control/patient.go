@@ -25,7 +25,7 @@ func NewPatientController(db map[int]model.Patient) *PatientController {
 }
 
 func (pc PatientController) Users(w http.ResponseWriter, r *http.Request) {
-	err := tpl.ExecuteTemplate(w,"user.gohtml", pc.storeDB)
+	err := tpl.ExecuteTemplate(w, "user.gohtml", pc.storeDB)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -58,8 +58,7 @@ func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
 	//fetch user
 	u := pc.storeDB[id]
 
-
-	err = tpl.ExecuteTemplate(w,"userview.gohtml", u)
+	err = tpl.ExecuteTemplate(w, "userview.gohtml", u)
 	if err != nil {
 		log.Fatalln(err)
 	}

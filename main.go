@@ -21,7 +21,7 @@ func main() {
 		case "DELETE":
 			pc.DeletePatient(writer, request)
 		default:
-			pc.Users(writer,request)
+			pc.Users(writer, request)
 		}
 	})
 
