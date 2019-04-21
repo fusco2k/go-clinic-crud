@@ -12,16 +12,20 @@ import (
 )
 
 var tpl *template.Template
+var storeDB map[int]model.Patient
 
+func init(){
+	tpl = template.Must(template.New("").ParseGlob("view/template/*.gohtml"))
+	storeDB = map[int]model.Patient{}
+}
 //create the type controller to use outside the package
 type PatientController struct {
 	storeDB map[int]model.Patient
 }
 
 //function to call a new controller
-func NewPatientController(db map[int]model.Patient) *PatientController {
-	tpl = template.Must(template.New("").ParseGlob("view/template/*.gohtml"))
-	return &PatientController{db}
+func NewPatientController() *PatientController {
+	return &PatientController{storeDB}
 }
 
 func (pc PatientController) Users(w http.ResponseWriter, r *http.Request) {
@@ -63,16 +67,9 @@ func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	//marshal provided interface into JSON structure
-	js, _ := json.Marshal(u)
-
 	//write the tcp 200 response with the JSON
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK) // 200
-	_, err = fmt.Fprintf(w, "%s\n", js)
-	if err != nil {
-		log.Println(err)
-	}
+	json.NewEncoder(w).Encode(u)
 }
 
 func (pc PatientController) CreatePatient(w http.ResponseWriter, r *http.Request) {
@@ -104,16 +101,9 @@ func (pc PatientController) CreatePatient(w http.ResponseWriter, r *http.Request
 	//store in the map db
 	pc.storeDB[u.Id] = u
 
-	//marshal provided interface into JSON structure
-	js, _ := json.Marshal(u)
-
-	//write the tcp 203 and redirect to the user page
+	//write the tcp 200 response with the JSON
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated) // 201
-	_, err = fmt.Fprintf(w, "%s\n", js)
-	if err != nil {
-		log.Fatal(err)
-	}
+	json.NewEncoder(w).Encode(u)
 }
 
 func (pc PatientController) DeletePatient(w http.ResponseWriter, r *http.Request) {
