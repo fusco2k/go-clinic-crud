@@ -5,10 +5,9 @@ curl http://localhost:8080/user/1
 curl -X POST -H "Content-Type: application/json" -d '{"fname":"James","lname":"Bond","email":"james@bond.com","blood":"an","id":1,"cf":12312312312,"birth":21121992,"phone":1212341234,"mobile":12123451234}' http://localhost:8080/user
 
 #DELETE USER
-curl -X DELETE -H "Content-Type: application/json" -d '{"id":1}' http://localhost:8080/user
-
-#GET USER
-curl -X GET -H "Content-Type: application/json" -d '{"ID":5cbd0c8a608e8258812aee7d}' http://localhost:8080/user
+curl -X DELETE -H "Content-Type: application/json" -d '{"id":2}' http://localhost:8080/user
 
 JSON Patient
-{"id":"5cbd0c8a608e8258812aee7d","ObjectID":"5cbd0c8a608e8258812aee7d","fname":"James","lname":"Bond","email":"james@bond.com","blood":"","cpf":0,"birth":21121992,"phone":1212341234,"mobile":12123451234}
+{"id":1,"fname":"James","lname":"Bond","email":"james@bond.com","blood":"","cpf":,"birth":21121992,"phone":1212341234,"mobile":12123451234}
+
+curl -X POST -H "Content-Type: application/json" -d '{"id":2,"fname":"Harry","lname":"Potter","email":"harry@potter.com","blood":"","cpf":,"birth":21121992,"phone":1212341234,"mobile":12123451234}' http://localhost:8080/user

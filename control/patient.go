@@ -5,7 +5,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/fusco2k/go-clinic-crud/model"
 
 	"github.com/fusco2k/go-clinic-crud/db"
 )
@@ -45,8 +48,9 @@ func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
 	//separate the request user id from url
 	urlID := strings.SplitAfter(r.URL.String(), "/user/")
 	stringID := urlID[1]
+	id, _ := strconv.Atoi(stringID)
 
-	patient := db.GetOne(stringID)
+	patient, _ := db.GetOne(id)
 
 	err = tpl.ExecuteTemplate(w, "userview.gohtml", patient)
 	if err != nil {
@@ -58,66 +62,50 @@ func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(patient)
 }
 
-// func (pc PatientController) CreatePatient(w http.ResponseWriter, r *http.Request) {
+//CreatePatient creates a new patient from the JSON request
+func (pc PatientController) CreatePatient(w http.ResponseWriter, r *http.Request) {
+	//parse the request to get data
+	err := r.ParseForm()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	//parse the request to get data
-// 	err := r.ParseForm()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	//initialize a patient model to populate with the json request
+	patient := model.Patient{}
 
-// 	//initialize a patient model to populate with the json request
-// 	u := model.Patient{}
+	//populate the patient using the json
+	err = json.NewDecoder(r.Body).Decode(&patient)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-// 	//populate the patient using the json
-// 	err = json.NewDecoder(r.Body).Decode(&u)
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
+	db.CreateOne(patient)
 
-// 	//check if there is a existent patient with the same id, if true, throws an error
-// 	if pc.storeDB[u.Id].Id == u.Id {
-// 		_, err := fmt.Fprint(w, "user already exists")
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-// 		return
-// 	}
+	//write the tcp 200 response with the JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(patient)
+}
 
-// 	//store in the map db
-// 	pc.storeDB[u.Id] = u
+//DeletePatient deletes the request id related patient
+func (pc PatientController) DeletePatient(w http.ResponseWriter, r *http.Request) {
+	//parse the request to get data
+	err := r.ParseForm()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	//write the tcp 200 response with the JSON
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(u)
-// }
+	//initialize a patient model to populate with the json request
+	patient := model.Patient{}
 
-// func (pc PatientController) DeletePatient(w http.ResponseWriter, r *http.Request) {
+	//populate the patient using the json
+	err = json.NewDecoder(r.Body).Decode(&patient)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-// 	//initialize a patient model to populate with the json request
-// 	u := model.Patient{}
+	db.DeleteOne(patient.ID)
 
-// 	//populate the patient using the json
-// 	err := json.NewDecoder(r.Body).Decode(&u)
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
-// 	fmt.Println(u.Id)
-
-// 	//check if there is a existent patient with the id
-// 	if pc.storeDB[u.Id].Id != u.Id {
-// 		w.WriteHeader(http.StatusNotFound)
-// 		return
-// 	}
-
-// 	//delete the patient from the map db
-// 	delete(pc.storeDB, u.Id)
-
-// 	//write the tcp 200 response with the message user deleted
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(http.StatusOK) // 200
-// 	_, err = fmt.Fprintln(w, "patient: "+strconv.Itoa(u.Id)+" deleted")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
+	//write the tcp 200 response with the JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(patient)
+}

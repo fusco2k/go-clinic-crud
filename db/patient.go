@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
 	"github.com/fusco2k/go-clinic-crud/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -32,7 +30,6 @@ func GetAll() []model.Patient {
 	for cursor.Next(nil) {
 		var patient model.Patient
 		err = cursor.Decode(&patient)
-		patient.ID = patient.ObjectID.Hex()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -48,19 +45,40 @@ func GetAll() []model.Patient {
 }
 
 //GetOne returns the patient from requested ID
-func GetOne(id string) model.Patient {
+func GetOne(id int) (model.Patient, bool){
 	var Patient model.Patient
 
-	object, err := primitive.ObjectIDFromHex(id)
+	err := patientDB.FindOne(nil, bson.M{"id": id}).Decode(&Patient)
+	if err != nil {
+		log.Println(err)
+		return Patient, false
+	}
+
+	return Patient, true
+}
+
+//CreateOne calls GetOne to check if there is already a patient with that id, if not, it creates the patient
+func CreateOne(patient model.Patient) {
+	_, b := GetOne(patient.ID)
+	if b {
+		return 
+	}
+	result, err := patientDB.InsertOne(nil, patient)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Inserted patient ID: ", result.InsertedID)
+}
 
-	err = patientDB.FindOne(nil, bson.M{"_id": object}).Decode(&Patient)
+//DeleteOne deletes the patient with the related id
+func DeleteOne(id int) {
+	_, b := GetOne(id)
+	if !b {
+		return 
+	}
+	result, err := patientDB.DeleteOne(nil, bson.M{"id":id})
 	if err != nil {
 		log.Fatal(err)
 	}
-	Patient.ID = Patient.ObjectID.Hex()
-
-	return Patient
+	fmt.Println("Patients deleted: ", result.DeletedCount)
 }

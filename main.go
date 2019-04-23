@@ -15,10 +15,10 @@ func main() {
 	})
 	http.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
-		// case "POST":
-		// 	pc.CreatePatient(writer, request)
-		// case "DELETE":
-		// 	pc.DeletePatient(writer, request)
+		case "POST":
+			pc.CreatePatient(writer, request)
+		case "DELETE":
+			pc.DeletePatient(writer, request)
 		default:
 			pc.Patients(writer, request)
 		}
