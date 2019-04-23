@@ -11,7 +11,7 @@ func main() {
 
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.HandleFunc("/user/", func(writer http.ResponseWriter, request *http.Request) {
-		// pc.GetPatient(writer, request)
+		pc.GetPatient(writer, request)
 	})
 	http.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {

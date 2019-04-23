@@ -1,11 +1,14 @@
 package db
 
 import (
-	"go.mongodb.org/mongo-driver/bson"
 	"fmt"
-	"github.com/fusco2k/go-clinic-crud/model"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"github.com/fusco2k/go-clinic-crud/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var patientDB *mongo.Collection
@@ -14,6 +17,7 @@ func init() {
 	clientDB := NewSession()
 	patientDB = clientDB.Database("clinic").Collection("patient")
 }
+
 //GetAll retrieves all patients on the patient collection
 func GetAll() []model.Patient {
 
@@ -41,4 +45,22 @@ func GetAll() []model.Patient {
 	fmt.Println(Patients)
 
 	return Patients
+}
+
+//GetOne returns the patient from requested ID
+func GetOne(id string) model.Patient {
+	var Patient model.Patient
+
+	object, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = patientDB.FindOne(nil, bson.M{"_id": object}).Decode(&Patient)
+	if err != nil {
+		log.Fatal(err)
+	}
+	Patient.ID = Patient.ObjectID.Hex()
+
+	return Patient
 }

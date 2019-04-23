@@ -1,33 +1,28 @@
 package control
 
 import (
-	// "encoding/json"
-	// "fmt"
-	"github.com/fusco2k/go-clinic-crud/db"
-	"github.com/fusco2k/go-clinic-crud/model"
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
-	// "strconv"
-	// "strings"
+	"strings"
+
+	"github.com/fusco2k/go-clinic-crud/db"
 )
 
 var tpl *template.Template
-var storeDB map[int]model.Patient
 
 func init() {
 	tpl = template.Must(template.New("").ParseGlob("view/template/*.gohtml"))
-	storeDB = map[int]model.Patient{}
 }
 
 //PatientController is a basic struct to get pointed to
 type PatientController struct {
-	storeDB map[int]model.Patient
 }
 
 //NewPatientController gives a pointed PC
 func NewPatientController() *PatientController {
-	return &PatientController{storeDB}
+	return &PatientController{}
 }
 
 //Patients retrieves all patients from the DB and shows as parsed template
@@ -39,43 +34,29 @@ func (pc PatientController) Patients(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// //function to call the patient by id
-// func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
-// 	//parse the request to get data
-// 	err := r.ParseForm()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+//GetPatient returns a patient from the requested ID
+func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
+	//parse the request to get data
+	err := r.ParseForm()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	//separate the request user id from url
-// 	urlId := strings.SplitAfter(r.URL.String(), "/user/")
-// 	stringId := urlId[1]
+	//separate the request user id from url
+	urlID := strings.SplitAfter(r.URL.String(), "/user/")
+	stringID := urlID[1]
 
-	
-// 	//convert the id to int
-// 	id, err := strconv.Atoi(stringId)
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
+	patient := db.GetOne(stringID)
 
-// 	//check if there is a existent patient with the id
-// 	if pc.storeDB[id].Id != id {
-// 		w.WriteHeader(http.StatusNotFound) // 404
-// 		return
-// 	}
+	err = tpl.ExecuteTemplate(w, "userview.gohtml", patient)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-// 	//fetch user
-// 	u := pc.storeDB[id]
-
-// 	err = tpl.ExecuteTemplate(w, "userview.gohtml", u)
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
-
-// 	//write the tcp 200 response with the JSON
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(u)
-// }
+	//write the tcp 200 response with the JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(patient)
+}
 
 // func (pc PatientController) CreatePatient(w http.ResponseWriter, r *http.Request) {
 
