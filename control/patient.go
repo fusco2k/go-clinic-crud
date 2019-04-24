@@ -2,22 +2,16 @@ package control
 
 import (
 	"encoding/json"
-	"html/template"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/fusco2k/go-clinic-crud/model"
 
 	"github.com/fusco2k/go-clinic-crud/db"
 )
-
-var tpl *template.Template
-
-func init() {
-	tpl = template.Must(template.New("").ParseGlob("view/template/*.gohtml"))
-}
 
 //PatientController is a basic struct to get pointed to
 type PatientController struct {
@@ -31,10 +25,7 @@ func NewPatientController() *PatientController {
 //Patients retrieves all patients from the DB and shows as parsed template
 func (pc PatientController) Patients(w http.ResponseWriter, r *http.Request) {
 	patients := db.GetAll()
-	err := tpl.ExecuteTemplate(w, "user.gohtml", patients)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	json.NewEncoder(w).Encode(patients)
 }
 
 //GetPatient returns a patient from the requested ID
@@ -44,21 +35,13 @@ func (pc PatientController) GetPatient(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	//separate the request user id from url
-	urlID := strings.SplitAfter(r.URL.String(), "/user/")
-	stringID := urlID[1]
-	id, _ := strconv.Atoi(stringID)
-
-	patient, _ := db.GetOne(id)
-
-	err = tpl.ExecuteTemplate(w, "userview.gohtml", patient)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	//write the tcp 200 response with the JSON
-	w.Header().Set("Content-Type", "application/json")
+	urlID := strings.SplitAfter(r.URL.String(), "/patients/")
+	//convert the id to ObjectID
+	id, _ := primitive.ObjectIDFromHex(urlID[1])
+	//get the patient relate to the url id
+	patient := db.GetOne(id)
+	//respond with the patient data by json
 	json.NewEncoder(w).Encode(patient)
 }
 
@@ -69,21 +52,15 @@ func (pc PatientController) CreatePatient(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	//initialize a patient model to populate with the json request
 	patient := model.Patient{}
-
-	//populate the patient using the json
+	//populate the patient decoding the json
 	err = json.NewDecoder(r.Body).Decode(&patient)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	//create the patient using the populated model
 	db.CreateOne(patient)
-
-	//write the tcp 200 response with the JSON
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(patient)
 }
 
 //DeletePatient deletes the request id related patient
@@ -93,19 +70,25 @@ func (pc PatientController) DeletePatient(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	//initialize a patient model to populate with the json request
 	patient := model.Patient{}
-
-	//populate the patient using the json
+	//populate the patient decoding the json
 	err = json.NewDecoder(r.Body).Decode(&patient)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	//delete the related patient
 	db.DeleteOne(patient.ID)
+}
 
-	//write the tcp 200 response with the JSON
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(patient)
+//UpdatePatient updates the requested patient with data related
+func (pc PatientController) UpdatePatient(w http.ResponseWriter, r *http.Request) {
+	//parse the request form
+	r.ParseForm()
+	//initialize the decode model
+	patient := []model.Patient{}
+	//decode the json
+	json.NewDecoder(r.Body).Decode(&patient)
+	//update the data on the collection
+	db.UpdateOne(patient)
 }

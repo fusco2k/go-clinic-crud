@@ -1,19 +1,20 @@
 package main
 
 import (
-	"github.com/fusco2k/go-clinic-crud/control"
 	"log"
 	"net/http"
+
+	"github.com/fusco2k/go-clinic-crud/control"
 )
 
 func main() {
 	pc := control.NewPatientController()
 
 	http.Handle("/favicon.ico", http.NotFoundHandler())
-	http.HandleFunc("/user/", func(writer http.ResponseWriter, request *http.Request) {
+	http.HandleFunc("/patients/", func(writer http.ResponseWriter, request *http.Request) {
 		pc.GetPatient(writer, request)
 	})
-	http.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
+	http.HandleFunc("/patients", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
 		case "POST":
 			pc.CreatePatient(writer, request)
@@ -21,6 +22,8 @@ func main() {
 			pc.DeletePatient(writer, request)
 		case "GET":
 			pc.Patients(writer, request)
+		case "PUT":
+			pc.UpdatePatient(writer, request)
 		}
 	})
 

@@ -1,13 +1,14 @@
 ##FIND USER
-curl http://localhost:8080/user/1
+curl http://localhost:8080/patients/5cc004093511e9de1a25e10b
 
 ##CREATE USER
-curl -X POST -H "Content-Type: application/json" -d '{"fname":"James","lname":"Bond","email":"james@bond.com","blood":"an","id":1,"cf":12312312312,"birth":21121992,"phone":1212341234,"mobile":12123451234}' http://localhost:8080/user
+curl -X POST -H "Content-Type: application/json" -d '{"_id":"5cc004093511e9de1a25e10b","fname":"James","lname":"Bond","email":"james@bond.com","cpf":12312312312,"birth":21121992,"phone":1212341234,"mobile":12123451234}' http://localhost:8080/patients
 
 #DELETE USER
-curl -X DELETE -H "Content-Type: application/json" -d '{"id":2}' http://localhost:8080/user
+curl -X DELETE -H "Content-Type: application/json" -d '{"_id":5cc004093511e9de1a25e10b}' http://localhost:8080/patients
 
 JSON Patient
-{"id":1,"fname":"James","lname":"Bond","email":"james@bond.com","blood":"","cpf":,"birth":21121992,"phone":1212341234,"mobile":12123451234}
+[{"_id":"5cc004093511e9de1a25e10b","fname":"James","lname":"Bond","email":"james@bond.com","cpf":12312312312,"birth":21121992,"phone":1212341234,"mobile":12123451234}]
 
-curl -X POST -H "Content-Type: application/json" -d '{"id":2,"fname":"Harry","lname":"Potter","email":"harry@potter.com","blood":"","cpf":,"birth":21121992,"phone":1212341234,"mobile":12123451234}' http://localhost:8080/user
+
+

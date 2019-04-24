@@ -11,7 +11,7 @@ import (
 func NewSession() *mongo.Client {
 
 	//Connects to mongo server and gets a client pointer
-	Client, err := mongo.Connect(nil, options.Client().ApplyURI("mongodb://192.168.122.95:27017"))
+	Client, err := mongo.Connect(nil, options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatal(err)
 	}
