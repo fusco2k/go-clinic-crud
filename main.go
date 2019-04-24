@@ -19,7 +19,7 @@ func main() {
 			pc.CreatePatient(writer, request)
 		case "DELETE":
 			pc.DeletePatient(writer, request)
-		default:
+		case "GET":
 			pc.Patients(writer, request)
 		}
 	})
