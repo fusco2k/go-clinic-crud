@@ -14,6 +14,9 @@ func main() {
 	http.HandleFunc("/patients/", func(writer http.ResponseWriter, request *http.Request) {
 		pc.GetPatient(writer, request)
 	})
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		http.Redirect(writer, request, "/patients", 307)
+	})
 	http.HandleFunc("/patients", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
 		case "POST":
