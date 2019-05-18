@@ -11,6 +11,7 @@ import (
 )
 
 var patientC *mongo.Collection
+
 //initialize the session and the collection handler
 func init() {
 	client := NewSession()

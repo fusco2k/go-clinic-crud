@@ -14,8 +14,7 @@ import (
 )
 
 //PatientController is a basic struct to get pointed to
-type PatientController struct {
-}
+type PatientController struct{}
 
 //NewPatientController gives a pointed PC
 func NewPatientController() *PatientController {
